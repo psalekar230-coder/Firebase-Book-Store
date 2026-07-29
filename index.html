@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BookStore - Motivational Bestsellers</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&display=swap');
+    body{font-family: 'Poppins', sans-serif;}
+    h1,h2,h3{font-family: 'Merriweather', serif;}
+   .cart-drawer{transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);}
+   .toast{animation: slideInRight 0.4s ease;}
+    @keyframes slideInRight{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+   .book-card{transition: all 0.3s ease;}
+   .book-card:hover{transform: translateY(-10px) scale(1.02);}
+   .gradient-bg{background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);}
+   .badge{background: linear-gradient(90deg, #F59E0B, #EF4444);}
+  </style>
+</head>
+<body class="bg-gradient-to-b from-amber-50 to-white">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-lg shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-book-open-reader text-indigo-600 text-2xl"></i>
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">BookStore</h1>
+      </div>
+      <div class="hidden md:flex flex-1 max-w-lg mx-8">
+        <div class="relative w-full">
+          <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400"></i>
+          <input id="searchInput" type="text" placeholder="Search motivational books..."
+            class="w-full pl-11 pr-4 py-3 border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50">
+        </div>
+      </div>
+      <button id="cartBtn" class="relative p-3 hover:bg-indigo-50 rounded-full transition">
+        <i class="fa-solid fa-cart-shopping text-xl text-gray-700"></i>
+        <span id="cartBadge" class="absolute -top-1 -right-1 badge text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="gradient-bg text-white relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 py-24 text-center">
+      <h2 class="text-4xl md:text-6xl font-black mb-4">Transform Your Life</h2>
+      <p class="text-xl mb-8">Motivational Bestsellers at <span class="font-bold text-yellow-300">50% OFF</span></p>
+      <button onclick="document.getElementById('productGrid').scrollIntoView()" class="bg-white text-indigo-600 px-10 py-4 rounded-full font-bold text-lg hover:scale-105 transition shadow-2xl">
+        Start Reading <i class="fa-solid fa-arrow-right ml-2"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- Books -->
+  <main class="max-w-7xl mx-auto px-4 py-12">
+    <div class="text-center mb-12">
+      <h3 class="text-4xl font-black text-gray-800 mb-2">Top Motivational Books</h3>
+      <p class="text-gray-500 text-lg">Change your mindset, change your life</p>
+    </div>
+    <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8"></div>
+  </main>
+
+  <!-- Order History Section -->
+  <section id="orderHistorySection" class="max-w-4xl mx-auto px-4 py-12 hidden">
+    <h3 class="text-3xl font-black text-center mb-8">📦 Your Orders</h3>
+    <div id="orderHistory"></div>
+  </section>
+
+  <!-- Cart Drawer -->
+  <div id="cartOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden"></div>
+  <div id="cartDrawer" class="cart-drawer fixed top-0 right-0 h-full w-full sm:w-[450px] bg-white shadow-2xl z-50 transform translate-x-full flex-col">
+    <div class="p-6 border-b flex justify-between items-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+      <h3 class="text-2xl font-bold flex items-center gap-2"><i class="fa-solid fa-cart-shopping"></i> Your Cart</h3>
+      <button id="closeCart" class="text-white/80 hover:text-white text-2xl">✕</button>
+    </div>
+    <div id="cartItems" class="flex-1 overflow-y-auto p-6"></div>
+    <div id="cartSummary" class="border-t p-6 bg-gradient-to-b from-white to-indigo-50 hidden">
+      <div class="mb-4">
+        <label class="text-sm font-semibold text-gray-700">Apply Coupon</label>
+        <div class="flex gap-2 mt-2">
+          <input id="promoInput" type="text" placeholder="MOTIVATE10" class="flex-1 px-4 py-3 border-2 rounded-xl text-sm">
+          <button id="applyPromo" class="bg-indigo-600 text-white px-6 py-3 rounded-xl text-sm font-bold">Apply</button>
+        </div>
+      </div>
+      <div class="space-y-2 text-base mb-4">
+        <div class="flex justify-between"><span>Subtotal:</span><span id="subtotal" class="font-bold">₹0</span></div>
+        <div class="flex justify-between text-green-600"><span>Discount:</span><span id="discount" class="font-bold">-₹0</span></div>
+        <div class="flex justify-between font-black text-2xl border-t pt-3"><span>Total:</span><span id="total" class="text-indigo-600">₹0</span></div>
+      </div>
+      <button id="checkoutBtn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-bold text-lg">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+      <h3 class="text-3xl font-black mb-6">Delivery Details</h3>
+      <form id="checkoutForm">
+        <input id="customerName" type="text" placeholder="Full Name" required class="w-full px-4 py-3 border-2 rounded-xl mb-4">
+        <textarea id="customerAddress" placeholder="Delivery Address" required rows="3" class="w-full px-4 py-3 border-2 rounded-xl mb-6"></textarea>
+        <button type="submit" class="w-full bg-green-600 text-white py-4 rounded-2xl font-bold text-lg">Place Order</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Success Popup -->
+  <div id="successPopup" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-10 max-w-sm w-full shadow-2xl text-center">
+      <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
+        <i class="fa-solid fa-check text-5xl text-green-600"></i>
+      </div>
+      <h3 class="text-3xl font-black mb-2">Order Placed Successfully!</h3>
+      <p class="text-gray-600">Order ID: <span id="orderIdText" class="font-bold text-indigo-600">#1024</span></p>
+      <button id="closeSuccess" class="mt-6 w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 rounded-2xl font-bold">View Order Details</button>
+    </div>
+  </div>
+
+  <!-- FIREBASE SCRIPT -->
+  <script type="module">
+    // 1. IMPORT FIREBASE
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAd3xMclKzj3XAjxWXztuqN2L3cbJ8DIaE",
+  authDomain: "book-store-89da1.firebaseapp.com",
+  databaseURL: "https://book-store-89da1-default-rtdb.firebaseio.com",
+  projectId: "book-store-89da1",
+  storageBucket: "book-store-89da1.firebasestorage.app",
+  messagingSenderId: "1022145294032",
+  appId: "1:1022145294032:web:7a8fc3f398849ac491b8d5",
+  measurementId: "G-09T5D329BV"
+};
+    
+
+    // 3. INITIALIZE
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 4. PRODUCTS
+    const products = [
+      {id: 1, name: "Atomic Habits", author: "James Clear", price: 399, rating: 4.8, reviews: 12450, img: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500"},
+      {id: 2, name: "The Psychology of Money", author: "Morgan Housel", price: 449, rating: 4.7, reviews: 9800, img: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=500"},
+      {id: 3, name: "Ikigai: The Japanese Secret", author: "Hector Garcia", price: 299, rating: 4.5, reviews: 7560, img: "https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=500"},
+      {id: 4, name: "Deep Work", author: "Cal Newport", price: 499, rating: 4.6, reviews: 6340, img: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=500"},
+      {id: 5, name: "Mindset", author: "Carol Dweck", price: 349, rating: 4.9, reviews: 8900, img: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=500"},
+      {id: 6, name: "Can't Hurt Me", author: "David Goggins", price: 529, rating: 4.8, reviews: 11200, img: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=500"},
+      {id: 7, name: "The Power of Habit", author: "Charles Duhigg", price: 379, rating: 4.6, reviews: 10200, img: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=500"},
+      {id: 8, name: "Think and Grow Rich", author: "Napoleon Hill", price: 279, rating: 4.7, reviews: 15000, img: "https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=500"}
+    ];
+
+    let cart = [];
+    let discountApplied = false;
+    let orders = [];
+    let orderCounter = 1024;
+
+    function renderProducts(list = products) {
+      document.getElementById('productGrid').innerHTML = list.map(p => `
+        <div class="book-card bg-white rounded-3xl shadow-lg overflow-hidden">
+          <img src="${p.img}" class="w-full h-72 object-cover">
+          <div class="p-5">
+            <h4 class="font-bold text-lg mb-1">${p.name}</h4>
+            <p class="text-sm text-gray-500 mb-2">by ${p.author}</p>
+            <div class="flex items-center mb-3"><span class="text-yellow-500 font-semibold">⭐ ${p.rating}</span></div>
+            <div class="flex items-center justify-between">
+              <span class="text-2xl font-black text-indigo-600">₹${p.price}</span>
+              <button onclick="addToCart(${p.id})" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2.5 rounded-xl font-bold">
+                <i class="fa-solid fa-cart-plus mr-1"></i> Add
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.addToCart = function(id) {
+      const product = products.find(p => p.id === id);
+      const existing = cart.find(item => item.id === id);
+      if(existing) { existing.qty++; } else { cart.push({...product, qty: 1}); }
+      updateCartBadge();
+      renderCart();
+      showToast(`"${product.name}" added to cart!`);
+    }
+
+    window.removeFromCart = function(id) { cart = cart.filter(item => item.id!== id); updateCartBadge(); renderCart(); }
+    window.updateQty = function(id, qty) { if(qty < 1) return removeFromCart(id); cart.find(i => i.id === id).qty = qty; renderCart(); }
+    function updateCartBadge() { document.getElementById('cartBadge').textContent = cart.reduce((sum, item) => sum + item.qty, 0); }
+
+    function renderCart() {
+      const cartItems = document.getElementById('cartItems');
+      const cartSummary = document.getElementById('cartSummary');
+      if(cart.length === 0) {
+        cartItems.innerHTML = `<div class="text-center mt-20"><i class="fa-solid fa-book text-6xl text-gray-200 mb-4"></i><p>Your cart is empty</p></div>`;
+        cartSummary.classList.add('hidden');
+        return;
+      }
+      cartSummary.classList.remove('hidden');
+      cartItems.innerHTML = cart.map(item => `
+        <div class="flex gap-4 mb-4 pb-4 border-b">
+          <img src="${item.img}" class="w-20 h-28 object-cover rounded-xl">
+          <div class="flex-1">
+            <h4 class="font-bold text-sm">${item.name}</h4>
+            <p class="text-xs text-gray-500">by ${item.author}</p>
+            <p class="text-indigo-600 font-black">₹${item.price}</p>
+            <div class="flex items-center gap-2 mt-2">
+              <button onclick="updateQty(${item.id}, ${item.qty-1})" class="w-8 h-8 border-2 rounded-lg font-bold">-</button>
+              <span class="font-bold">${item.qty}</span>
+              <button onclick="updateQty(${item.id}, ${item.qty+1})" class="w-8 h-8 border-2 rounded-lg font-bold">+</button>
+              <button onclick="removeFromCart(${item.id})" class="ml-auto text-red-500"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      calculateTotal();
+    }
+
+    function calculateTotal() {
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const discountAmount = discountApplied? Math.round(subtotal * 0.1) : 0;
+      const total = subtotal - discountAmount;
+      document.getElementById('subtotal').textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+      document.getElementById('discount').textContent = `-₹${discountAmount.toLocaleString('en-IN')}`;
+      document.getElementById('total').textContent = `₹${total.toLocaleString('en-IN')}`;
+    }
+
+    document.getElementById('applyPromo').onclick = () => {
+      if(document.getElementById('promoInput').value.trim().toUpperCase() === 'MOTIVATE10') {
+        discountApplied = true; calculateTotal(); showToast('10% Discount Applied!');
+        document.getElementById('promoInput').disabled = true;
+      } else { showToast('Invalid Coupon'); }
+    };
+
+    document.getElementById('cartBtn').onclick = () => {
+      document.getElementById('cartDrawer').classList.remove('translate-x-full');
+      document.getElementById('cartOverlay').classList.remove('hidden');
+    };
+    document.getElementById('closeCart').onclick = closeCart;
+    document.getElementById('cartOverlay').onclick = closeCart;
+    function closeCart() {
+      document.getElementById('cartDrawer').classList.add('translate-x-full');
+      document.getElementById('cartOverlay').classList.add('hidden');
+    }
+
+    document.getElementById('checkoutBtn').onclick = () => {
+      document.getElementById('checkoutModal').classList.remove('hidden');
+      document.getElementById('checkoutModal').classList.add('flex');
+      closeCart();
+    };
+
+    // 5. PLACE ORDER - NOW SAVES TO FIREBASE
+    document.getElementById('checkoutForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('customerName').value;
+      const address = document.getElementById('customerAddress').value;
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const discount = discountApplied? Math.round(subtotal * 0.1) : 0;
+      const total = subtotal - discount;
+
+      const newOrder = {
+        orderId: orderCounter,
+        date: serverTimestamp(),
+        customer: name,
+        address: address,
+        items: [...cart],
+        subtotal: subtotal,
+        discount: discount,
+        total: total,
+        status: "Confirmed"
+      };
+
+      try {
+        await addDoc(collection(db, "orders"), newOrder); // FIREBASE LA SAVE
+        document.getElementById('orderIdText').textContent = `#${orderCounter}`;
+        orderCounter++;
+        showToast("Order saved to Firebase!");
+      } catch (e) {
+        console.error("Error: ", e);
+        showToast("Order failed!");
+      }
+
+      document.getElementById('checkoutModal').classList.add('hidden');
+      document.getElementById('successPopup').classList.remove('hidden');
+      document.getElementById('successPopup').classList.add('flex');
+
+      cart = []; discountApplied = false;
+      document.getElementById('promoInput').disabled = false;
+      document.getElementById('promoInput').value = '';
+      updateCartBadge();
+      renderCart();
+      document.getElementById('checkoutForm').reset();
+      loadOrdersFromFirebase(); // Reload orders
+    };
+
+    // 6. LOAD ORDERS FROM FIREBASE
+    async function loadOrdersFromFirebase() {
+      const q = query(collection(db, "orders"), orderBy("date", "desc"));
+      const querySnapshot = await getDocs(q);
+      orders = [];
+      querySnapshot.forEach((doc) => {
+        orders.push(doc.data());
+      });
+      renderOrderHistory();
+    }
+
+    function renderOrderHistory() {
+      if(orders.length === 0) return;
+      document.getElementById('orderHistorySection').classList.remove('hidden');
+      document.getElementById('orderHistory').innerHTML = orders.map(order => `
+        <div class="bg-white rounded-2xl shadow-xl p-6 mb-6 border-2 border-indigo-100">
+          <div class="flex justify-between items-center border-b pb-4 mb-4">
+            <div>
+              <h4 class="text-xl font-black">Order ${order.orderId}</h4>
+              <p class="text-sm text-gray-500">${order.date?.toDate? order.date.toDate().toLocaleString() : 'Just now'}</p>
+            </div>
+            <span class="bg-green-100 text-green-700 px-4 py-2 rounded-full font-bold text-sm">${order.status}</span>
+          </div>
+          <div class="mb-4">
+            <h5 class="font-bold mb-2"><i class="fa-solid fa-user mr-2 text-indigo-600"></i>Customer Details</h5>
+            <p><b>Name:</b> ${order.customer}</p>
+            <p><b>Address:</b> ${order.address}</p>
+          </div>
+          <div class="mb-4">
+            <h5 class="font-bold mb-2"><i class="fa-solid fa-box mr-2 text-indigo-600"></i>Items Ordered</h5>
+            ${order.items.map(item => `
+              <div class="flex justify-between py-2 border-b">
+                <span>${item.name} x ${item.qty}</span>
+                <span class="font-semibold">₹${item.price * item.qty}</span>
+              </div>
+            `).join('')}
+          </div>
+          <div class="bg-indigo-50 rounded-xl p-4">
+            <div class="flex justify-between"><span>Subtotal:</span><span>₹${order.subtotal}</span></div>
+            <div class="flex justify-between text-green-600"><span>Discount:</span><span>-₹${order.discount}</span></div>
+            <div class="flex justify-between font-black text-xl border-t mt-2 pt-2"><span>Total Paid:</span><span class="text-indigo-600">₹${order.total}</span></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('closeSuccess').onclick = () => {
+      document.getElementById('successPopup').classList.add('hidden');
+      document.getElementById('orderHistorySection').scrollIntoView({behavior: 'smooth'});
+    };
+
+    function showToast(msg) {
+      const toast = document.createElement('div');
+      toast.className = 'toast fixed top-24 right-4 bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl z-50 font-semibold';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function handleSearch(val) {
+      renderProducts(products.filter(p => p.name.toLowerCase().includes(val.toLowerCase()) || p.author.toLowerCase().includes(val.toLowerCase())));
+    }
+    document.getElementById('searchInput').oninput = (e) => handleSearch(e.target.value);
+
+    // START
+    renderProducts();
+    loadOrdersFromFirebase(); // Page load zalyavar Firebase varun orders ghe
+  </script>
+</body>
+</html>
