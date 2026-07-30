@@ -119,10 +119,9 @@
 
   <!-- FIREBASE SCRIPT -->
   <script type="module">
-    // 1. IMPORT FIREBASE
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
 const firebaseConfig = {
   apiKey: "AIzaSyAd3xMclKzj3XAjxWXztuqN2L3cbJ8DIaE",
   authDomain: "book-store-89da1.firebaseapp.com",
@@ -134,11 +133,9 @@ const firebaseConfig = {
   measurementId: "G-09T5D329BV"
 };
 
-    // 3. INITIALIZE
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 4. PRODUCTS
     const products = [
       {id: 1, name: "Atomic Habits", author: "James Clear", price: 399, rating: 4.8, reviews: 12450, img: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500"},
       {id: 2, name: "The Psychology of Money", author: "Morgan Housel", price: 449, rating: 4.7, reviews: 9800, img: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=500"},
@@ -248,7 +245,6 @@ const firebaseConfig = {
       closeCart();
     };
 
-    // 5. PLACE ORDER - NOW SAVES TO FIREBASE
     document.getElementById('checkoutForm').onsubmit = async (e) => {
       e.preventDefault();
       const name = document.getElementById('customerName').value;
@@ -270,7 +266,7 @@ const firebaseConfig = {
       };
 
       try {
-        await addDoc(collection(db, "orders"), newOrder); // FIREBASE LA SAVE
+        await addDoc(collection(db, "orders"), newOrder);
         document.getElementById('orderIdText').textContent = `#${orderCounter}`;
         orderCounter++;
         showToast("Order saved to Firebase!");
@@ -289,10 +285,9 @@ const firebaseConfig = {
       updateCartBadge();
       renderCart();
       document.getElementById('checkoutForm').reset();
-      loadOrdersFromFirebase(); // Reload orders
+      loadOrdersFromFirebase();
     };
 
-    // 6. LOAD ORDERS FROM FIREBASE
     async function loadOrdersFromFirebase() {
       const q = query(collection(db, "orders"), orderBy("date", "desc"));
       const querySnapshot = await getDocs(q);
@@ -356,16 +351,15 @@ const firebaseConfig = {
     }
     document.getElementById('searchInput').oninput = (e) => handleSearch(e.target.value);
 
-    // START
     renderProducts();
-    loadOrdersFromFirebase(); // Page load zalyavar Firebase varun orders ghe
+    loadOrdersFromFirebase();
   </script>
 
-  <!-- CHATBASE CHATBOT SCRIPT - START -->
+  <!-- ===== CHATBASE CHATBOT SCRIPT START ===== -->
   <script>
   (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="YOUR-BOT-ID";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
   </script>
-  <!-- CHATBASE CHATBOT SCRIPT - END -->
+  <!-- ===== CHATBASE CHATBOT SCRIPT END ===== -->
 
 </body>
 </html>
