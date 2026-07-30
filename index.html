@@ -10,13 +10,13 @@
     @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&display=swap');
     body{font-family: 'Poppins', sans-serif;}
     h1,h2,h3{font-family: 'Merriweather', serif;}
-   .cart-drawer{transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);}
-   .toast{animation: slideInRight 0.4s ease;}
+  .cart-drawer{transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);}
+  .toast{animation: slideInRight 0.4s ease;}
     @keyframes slideInRight{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
-   .book-card{transition: all 0.3s ease;}
-   .book-card:hover{transform: translateY(-10px) scale(1.02);}
-   .gradient-bg{background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);}
-   .badge{background: linear-gradient(90deg, #F59E0B, #EF4444);}
+  .book-card{transition: all 0.3s ease;}
+  .book-card:hover{transform: translateY(-10px) scale(1.02);}
+  .gradient-bg{background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);}
+  .badge{background: linear-gradient(90deg, #F59E0B, #EF4444);}
   </style>
 </head>
 <body class="bg-gradient-to-b from-amber-50 to-white">
@@ -133,7 +133,6 @@ const firebaseConfig = {
   appId: "1:1022145294032:web:7a8fc3f398849ac491b8d5",
   measurementId: "G-09T5D329BV"
 };
-    
 
     // 3. INITIALIZE
     const app = initializeApp(firebaseConfig);
@@ -361,5 +360,12 @@ const firebaseConfig = {
     renderProducts();
     loadOrdersFromFirebase(); // Page load zalyavar Firebase varun orders ghe
   </script>
+
+  <!-- CHATBASE CHATBOT SCRIPT - START -->
+  <script>
+  (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="YOUR-BOT-ID";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+  </script>
+  <!-- CHATBASE CHATBOT SCRIPT - END -->
+
 </body>
 </html>
